@@ -1,0 +1,35 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Operation successful",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "signUp": "Sign Up"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "hr": "HR",
+    "crm": "CRM",
+    "finance": "Finance",
+    "inventory": "Inventory",
+    "projects": "Projects",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "welcome": "Welcome to EMS",
+    "overview": "Overview",
+    "recentActivity": "Recent Activity",
+    "statistics": "Statistics"
+  }
+} 

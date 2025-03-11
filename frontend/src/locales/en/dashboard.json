@@ -1,0 +1,39 @@
+{
+  "title": "Dashboard",
+  "totalEmployees": "Total Employees",
+  "totalDepartments": "Total Departments",
+  "pendingLeaves": "Pending Leave Requests",
+  "pendingPayrolls": "Pending Payrolls",
+  "welcome": "Welcome to Company OS",
+  "totalUsers": "Total Users",
+  "totalRevenue": "Total Revenue",
+  "activeProjects": "Active Projects",
+  "pendingTasks": "Pending Tasks",
+  "modules": "Available Modules",
+  "modules": {
+    "crm": {
+      "title": "CRM",
+      "description": "Manage customers, contacts, opportunities, and activities"
+    },
+    "inventory": {
+      "title": "Inventory",
+      "description": "Track products, stock levels, and manage warehouses"
+    },
+    "accounting": {
+      "title": "Accounting",
+      "description": "Handle invoices, expenses, and financial reports"
+    },
+    "projects": {
+      "title": "Projects",
+      "description": "Manage projects, tasks, and team collaboration"
+    },
+    "communication": {
+      "title": "Communication",
+      "description": "Email, chat, and internal messaging"
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Configure system settings and user preferences"
+    }
+  }
+} 

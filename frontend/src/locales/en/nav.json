@@ -1,0 +1,13 @@
+{
+  "app": {
+    "name": "Company OS"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "hr": "Human Resources",
+    "departments": "Departments",
+    "positions": "Positions",
+    "leaves": "Leave Requests",
+    "payroll": "Payroll"
+  }
+} 

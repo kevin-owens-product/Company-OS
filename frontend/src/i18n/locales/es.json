@@ -1,0 +1,35 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "success": "Operación exitosa",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "search": "Buscar"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "logout": "Cerrar Sesión",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "signUp": "Registrarse"
+  },
+  "navigation": {
+    "dashboard": "Panel de Control",
+    "hr": "RRHH",
+    "crm": "CRM",
+    "finance": "Finanzas",
+    "inventory": "Inventario",
+    "projects": "Proyectos",
+    "settings": "Configuración"
+  },
+  "dashboard": {
+    "welcome": "Bienvenido a EMS",
+    "overview": "Resumen",
+    "recentActivity": "Actividad Reciente",
+    "statistics": "Estadísticas"
+  }
+} 

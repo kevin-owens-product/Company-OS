@@ -1,0 +1,36 @@
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne } from 'typeorm';
+import { Employee } from './employee.entity';
+import { Tenant } from '../../tenants/entities/tenant.entity';
+
+@Entity('departments')
+export class Department {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  name: string;
+
+  @Column({ nullable: true })
+  description: string;
+
+  @Column({ nullable: true })
+  managerId: string;
+
+  @Column({ type: 'jsonb', default: {} })
+  settings: Record<string, any>;
+
+  @Column({ default: true })
+  isActive: boolean;
+
+  @ManyToOne(() => Tenant, tenant => tenant.departments)
+  tenant: Tenant;
+
+  @OneToMany(() => Employee, employee => employee.department)
+  employees: Employee[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+} 
