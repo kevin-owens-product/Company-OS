@@ -77,7 +77,6 @@ const repoStatusColors: Record<RepositoryStatus, 'default' | 'warning' | 'info' 
   [RepositoryStatus.READY]: 'success',
   [RepositoryStatus.STALE]: 'warning',
   [RepositoryStatus.ERROR]: 'error',
-  [RepositoryStatus.ARCHIVED]: 'default',
 };
 
 interface TabPanelProps {
