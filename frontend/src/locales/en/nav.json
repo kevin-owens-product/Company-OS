@@ -4,6 +4,7 @@
   },
   "nav": {
     "dashboard": "Dashboard",
+    "codeforge": "CodeForge",
     "hr": "Human Resources",
     "departments": "Departments",
     "positions": "Positions",

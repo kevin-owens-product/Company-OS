@@ -7,6 +7,7 @@ import { TenantsModule } from './tenants/tenants.module';
 import { StripeModule } from './stripe/stripe.module';
 import { KafkaModule } from './kafka/kafka.module';
 import { RedisModule } from './redis/redis.module';
+import { CodeForgeModule } from './codeforge/codeforge.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -27,6 +28,7 @@ import { AppService } from './app.service';
     StripeModule,
     KafkaModule,
     RedisModule,
+    CodeForgeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
