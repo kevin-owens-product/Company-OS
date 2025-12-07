@@ -58,7 +58,7 @@ export default function TransformationsPage() {
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
-  const [selectedCodebase, setSelectedCodebase] = useState<string>(searchParams.get('codebaseId') || '');
+  const [selectedCodebase, setSelectedCodebase] = useState<string>(searchParams?.get('codebaseId') || '');
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
     message: '',

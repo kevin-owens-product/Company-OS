@@ -60,11 +60,11 @@ import {
 const steps = ['Select Codebase', 'Choose Playbook', 'Configure Options', 'Review & Execute'];
 
 const categoryIcons: Record<PlaybookCategory, React.ReactNode> = {
-  [PlaybookCategory.SECURITY_HARDENING]: <SecurityIcon />,
-  [PlaybookCategory.CODE_MODERNIZATION]: <UpgradeIcon />,
-  [PlaybookCategory.DEAD_CODE_REMOVAL]: <DeleteSweepIcon />,
-  [PlaybookCategory.DEPENDENCY_UPDATE]: <BuildIcon />,
-  [PlaybookCategory.ARCHITECTURE_REFACTOR]: <ArchitectureIcon />,
+  [PlaybookCategory.CONSOLIDATION]: <ArchitectureIcon />,
+  [PlaybookCategory.SECURITY]: <SecurityIcon />,
+  [PlaybookCategory.COST_OPTIMIZATION]: <DeleteSweepIcon />,
+  [PlaybookCategory.DEVELOPER_EXPERIENCE]: <UpgradeIcon />,
+  [PlaybookCategory.COMPLIANCE]: <BuildIcon />,
   [PlaybookCategory.CUSTOM]: <BuildIcon />,
 };
 
@@ -85,7 +85,7 @@ export default function NewTransformationPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Step 1: Codebase selection
-  const [selectedCodebaseId, setSelectedCodebaseId] = useState<string>(searchParams.get('codebaseId') || '');
+  const [selectedCodebaseId, setSelectedCodebaseId] = useState<string>(searchParams?.get('codebaseId') || '');
 
   // Step 2: Playbook selection
   const [selectedPlaybookId, setSelectedPlaybookId] = useState<string>('');
@@ -113,7 +113,7 @@ export default function NewTransformationPage() {
   // Fetch playbooks
   const { data: playbooks = [], isLoading: playbooksLoading } = useQuery({
     queryKey: ['playbooks'],
-    queryFn: PlaybookService.findAll,
+    queryFn: () => PlaybookService.findAll(),
     enabled: authStatus === 'authenticated',
   });
 
@@ -126,8 +126,8 @@ export default function NewTransformationPage() {
 
   // Create transformation mutation
   const createTransformationMutation = useMutation({
-    mutationFn: (data: CreateTransformationDto) =>
-      TransformationService.create(selectedCodebaseId, data),
+    mutationFn: (data: Omit<CreateTransformationDto, 'codebaseId'>) =>
+      TransformationService.create({ ...data, codebaseId: selectedCodebaseId }),
     onSuccess: (data) => {
       router.push(`/codeforge/transformations?highlight=${data.id}`);
     },
@@ -161,12 +161,12 @@ export default function NewTransformationPage() {
     if (activeStep === steps.length - 1) {
       // Execute
       createTransformationMutation.mutate({
-        playbookId: selectedPlaybookId,
-        targetRepositories: selectedRepoIds,
-        config: {
-          oversightLevel,
-          createPullRequest,
-          dryRun,
+        name: selectedPlaybook?.name || 'Transformation',
+        type: 'playbook_execution' as any,
+        oversightLevel,
+        scope: {
+          repositories: selectedRepoIds,
+          playbooks: [selectedPlaybookId],
         },
       });
       return;
@@ -300,7 +300,7 @@ export default function NewTransformationPage() {
               <FormControl sx={{ mb: 3, minWidth: 200 }}>
                 <InputLabel>Category Filter</InputLabel>
                 <Select
-                  value={categoryFilter}
+                  value={categoryFilter as string}
                   label="Category Filter"
                   onChange={(e) => setCategoryFilter(e.target.value as PlaybookCategory | 'all')}
                 >
@@ -391,7 +391,7 @@ export default function NewTransformationPage() {
                         </ListItemIcon>
                         <ListItemText
                           primary={repo.name}
-                          secondary={repo.url}
+                          secondary={repo.remoteUrl}
                         />
                       </ListItem>
                     ))}

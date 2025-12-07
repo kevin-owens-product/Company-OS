@@ -41,6 +41,7 @@ export enum RepositoryProvider {
   TFS = 'tfs',
   PERFORCE = 'perforce',
   LOCAL = 'local',
+  OTHER = 'other',
 }
 
 export enum RepositoryStatus {
