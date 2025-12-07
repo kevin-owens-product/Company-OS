@@ -26,10 +26,16 @@ export class Position {
   @Column({ default: true })
   isActive: boolean;
 
-  @ManyToOne(() => Tenant, tenant => tenant.positions)
+  @Column({ nullable: true })
+  tenantId: string;
+
+  @ManyToOne(() => Tenant)
   tenant: Tenant;
 
-  @ManyToOne(() => Department, department => department.positions)
+  @Column({ nullable: true })
+  departmentId: string;
+
+  @ManyToOne(() => Department)
   department: Department;
 
   @OneToMany(() => Employee, employee => employee.position)

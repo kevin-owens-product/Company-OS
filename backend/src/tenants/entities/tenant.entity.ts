@@ -27,6 +27,10 @@ export class Tenant {
   @OneToMany(() => User, user => user.tenant)
   users: User[];
 
+  // These relations are defined in HR module but referenced here for TypeORM
+  departments?: any[];
+  positions?: any[];
+
   @CreateDateColumn()
   createdAt: Date;
 

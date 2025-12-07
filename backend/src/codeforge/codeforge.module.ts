@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 // Entities
 import { Codebase } from './entities/codebase.entity';
@@ -17,6 +18,9 @@ import { FindingService } from './services/finding.service';
 import { PlaybookService } from './services/playbook.service';
 import { TransformationService } from './services/transformation.service';
 import { IngestionService } from './services/ingestion.service';
+import { GitService } from './services/git.service';
+import { AiAnalysisService } from './services/ai-analysis.service';
+import { AnalysisOrchestratorService } from './services/analysis-orchestrator.service';
 
 // Controllers
 import { CodebaseController } from './controllers/codebase.controller';
@@ -27,6 +31,7 @@ import { TransformationController } from './controllers/transformation.controlle
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     TypeOrmModule.forFeature([
       Codebase,
       Repository,
@@ -44,6 +49,9 @@ import { TransformationController } from './controllers/transformation.controlle
     PlaybookService,
     TransformationService,
     IngestionService,
+    GitService,
+    AiAnalysisService,
+    AnalysisOrchestratorService,
   ],
   controllers: [
     CodebaseController,
@@ -60,6 +68,9 @@ import { TransformationController } from './controllers/transformation.controlle
     PlaybookService,
     TransformationService,
     IngestionService,
+    GitService,
+    AiAnalysisService,
+    AnalysisOrchestratorService,
   ],
 })
 export class CodeForgeModule {}
