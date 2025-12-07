@@ -1,9 +1,14 @@
 import { Controller, Post, Body, UseGuards, Get, Request, UnauthorizedException } from '@nestjs/common';
+import { Request as ExpressRequest } from 'express';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
+
+interface AuthenticatedRequest extends ExpressRequest {
+  user: { id: string; email: string };
+}
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -21,7 +26,7 @@ export class AuthController {
         loginDto.email,
         loginDto.password,
       );
-      
+
       return this.authService.login(user);
     } catch (error) {
       throw new UnauthorizedException('Invalid credentials');
@@ -34,7 +39,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Get user profile' })
   @ApiResponse({ status: 200, description: 'Profile retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  getProfile(@Request() req) {
+  getProfile(@Request() req: AuthenticatedRequest) {
     return req.user;
   }
 
@@ -44,7 +49,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: 200, description: 'Token refreshed successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  refreshToken(@Request() req) {
+  refreshToken(@Request() req: AuthenticatedRequest) {
     return this.authService.refreshToken(req.user);
   }
 } 

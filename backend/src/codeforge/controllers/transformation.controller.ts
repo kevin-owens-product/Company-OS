@@ -9,9 +9,14 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { Request as ExpressRequest } from 'express';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { TransformationService } from '../services/transformation.service';
 import { CreateTransformationDto, ApprovalActionDto } from '../dto/create-transformation.dto';
+
+interface AuthenticatedRequest extends ExpressRequest {
+  user: { id: string; tenantId: string };
+}
 
 @Controller('api/v1/transformations')
 @UseGuards(JwtAuthGuard)
@@ -19,7 +24,7 @@ export class TransformationController {
   constructor(private readonly transformationService: TransformationService) {}
 
   @Post()
-  async create(@Body() createTransformationDto: CreateTransformationDto, @Request() req) {
+  async create(@Body() createTransformationDto: CreateTransformationDto, @Request() req: AuthenticatedRequest) {
     return this.transformationService.create(createTransformationDto, req.user.id);
   }
 
@@ -55,7 +60,7 @@ export class TransformationController {
   async approve(
     @Param('id') id: string,
     @Body() approvalDto: ApprovalActionDto,
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
   ) {
     return this.transformationService.approve(id, req.user.id, approvalDto.comment);
   }
@@ -64,7 +69,7 @@ export class TransformationController {
   async reject(
     @Param('id') id: string,
     @Body() approvalDto: ApprovalActionDto,
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
   ) {
     if (!approvalDto.comment) {
       throw new Error('Comment is required when rejecting a transformation');

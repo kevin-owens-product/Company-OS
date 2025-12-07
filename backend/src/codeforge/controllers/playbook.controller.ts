@@ -10,10 +10,15 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { Request as ExpressRequest } from 'express';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { PlaybookService } from '../services/playbook.service';
 import { CreatePlaybookDto, UpdatePlaybookDto } from '../dto/create-playbook.dto';
 import { PlaybookCategory } from '../entities/playbook.entity';
+
+interface AuthenticatedRequest extends ExpressRequest {
+  user: { id: string; tenantId: string };
+}
 
 @Controller('api/v1/playbooks')
 @UseGuards(JwtAuthGuard)
@@ -21,12 +26,12 @@ export class PlaybookController {
   constructor(private readonly playbookService: PlaybookService) {}
 
   @Post()
-  async create(@Body() createPlaybookDto: CreatePlaybookDto, @Request() req) {
+  async create(@Body() createPlaybookDto: CreatePlaybookDto, @Request() req: AuthenticatedRequest) {
     return this.playbookService.create(createPlaybookDto, req.user.tenantId);
   }
 
   @Get()
-  async findAll(@Request() req, @Query('category') category?: PlaybookCategory) {
+  async findAll(@Request() req: AuthenticatedRequest, @Query('category') category?: PlaybookCategory) {
     if (category) {
       return this.playbookService.findByCategory(category, req.user.tenantId);
     }

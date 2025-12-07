@@ -9,6 +9,7 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { Request as ExpressRequest } from 'express';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CodebaseService } from '../services/codebase.service';
 import { IngestionService } from '../services/ingestion.service';
@@ -16,6 +17,10 @@ import { AnalysisService } from '../services/analysis.service';
 import { CreateCodebaseDto, UpdateCodebaseDto } from '../dto/create-codebase.dto';
 import { ConnectGitHubDto, ConnectGitLabDto } from '../dto/create-repository.dto';
 import { TriggerAnalysisDto } from '../dto/create-analysis.dto';
+
+interface AuthenticatedRequest extends ExpressRequest {
+  user: { id: string; tenantId: string };
+}
 
 @Controller('api/v1/codebases')
 @UseGuards(JwtAuthGuard)
@@ -27,17 +32,17 @@ export class CodebaseController {
   ) {}
 
   @Post()
-  async create(@Body() createCodebaseDto: CreateCodebaseDto, @Request() req) {
+  async create(@Body() createCodebaseDto: CreateCodebaseDto, @Request() req: AuthenticatedRequest) {
     return this.codebaseService.create(createCodebaseDto, req.user.tenantId);
   }
 
   @Get()
-  async findAll(@Request() req) {
+  async findAll(@Request() req: AuthenticatedRequest) {
     return this.codebaseService.findAll(req.user.tenantId);
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string, @Request() req) {
+  async findOne(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
     return this.codebaseService.findOne(id, req.user.tenantId);
   }
 
@@ -45,19 +50,19 @@ export class CodebaseController {
   async update(
     @Param('id') id: string,
     @Body() updateCodebaseDto: UpdateCodebaseDto,
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
   ) {
     return this.codebaseService.update(id, updateCodebaseDto, req.user.tenantId);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string, @Request() req) {
+  async remove(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
     await this.codebaseService.remove(id, req.user.tenantId);
     return { success: true };
   }
 
   @Get(':id/statistics')
-  async getStatistics(@Param('id') id: string, @Request() req) {
+  async getStatistics(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
     return this.codebaseService.getStatistics(id, req.user.tenantId);
   }
 
@@ -83,7 +88,7 @@ export class CodebaseController {
   async triggerAnalysis(
     @Param('id') id: string,
     @Body() triggerDto: TriggerAnalysisDto,
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
   ) {
     return this.analysisService.create({
       type: triggerDto.type,
