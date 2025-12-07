@@ -145,7 +145,7 @@ export default function CodebaseDetailPage() {
 
   // Add repository mutation
   const addRepoMutation = useMutation({
-    mutationFn: (data: CreateRepositoryDto) => RepositoryService.create(codebaseId, data),
+    mutationFn: (data: CreateRepositoryDto) => RepositoryService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['repositories', codebaseId] });
       setAddRepoOpen(false);
@@ -159,7 +159,7 @@ export default function CodebaseDetailPage() {
 
   // Delete repository mutation
   const deleteRepoMutation = useMutation({
-    mutationFn: (repoId: string) => RepositoryService.remove(codebaseId, repoId),
+    mutationFn: (repoId: string) => RepositoryService.remove(repoId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['repositories', codebaseId] });
       setSnackbar({ open: true, message: 'Repository removed successfully', severity: 'success' });
