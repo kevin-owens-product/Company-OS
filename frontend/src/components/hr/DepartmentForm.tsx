@@ -36,9 +36,7 @@ export const DepartmentForm: React.FC<DepartmentFormProps> = ({
     name: '',
     description: '',
     managerId: '',
-    settings: {},
     isActive: true,
-    tenantId: '',
   });
 
   useEffect(() => {
@@ -47,9 +45,7 @@ export const DepartmentForm: React.FC<DepartmentFormProps> = ({
         name: department.name || '',
         description: department.description || '',
         managerId: department.managerId || '',
-        settings: department.settings || {},
         isActive: department.isActive ?? true,
-        tenantId: department.tenantId || '',
       });
     }
   }, [department]);
