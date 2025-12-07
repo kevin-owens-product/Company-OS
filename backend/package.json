@@ -2,10 +2,10 @@
   "name": "company-os-backend",
   "version": "1.0.0",
   "description": "Backend for Company OS HR Management System",
-  "main": "dist/server.js",
+  "main": "dist/main.js",
   "scripts": {
-    "start": "node dist/server.js",
-    "dev": "nodemon src/server.ts",
+    "start": "node dist/main.js",
+    "dev": "npx ts-node src/main.ts",
     "build": "tsc",
     "test": "jest"
   },
@@ -37,7 +37,6 @@
     "dotenv": "^16.0.3",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.0.3",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
