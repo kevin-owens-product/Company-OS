@@ -44,8 +44,9 @@ export class AnalysisOrchestratorService {
 
       // Get repositories to analyze
       const repositories = await this.repositoryService.findAllByCodebase(codebaseId);
-      const targetRepos = analysis.config?.targetRepositories?.length
-        ? repositories.filter((r) => analysis.config.targetRepositories.includes(r.id))
+      const targetRepoIds = analysis.config?.targetRepositories ?? [];
+      const targetRepos = targetRepoIds.length
+        ? repositories.filter((r) => targetRepoIds.includes(r.id))
         : repositories;
 
       if (targetRepos.length === 0) {
