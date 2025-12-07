@@ -10,10 +10,7 @@ import { HRModule } from './pages/HRModule';
 import { Login } from './pages/Login';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { authService } from './services/auth.service';
-import { i18n } from './i18n';
-
-// Initialize i18n
-i18n.init();
+import './i18n';
 
 function App() {
   useEffect(() => {

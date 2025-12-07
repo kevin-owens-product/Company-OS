@@ -22,11 +22,17 @@ export class Department {
   @Column({ default: true })
   isActive: boolean;
 
-  @ManyToOne(() => Tenant, tenant => tenant.departments)
+  @Column({ nullable: true })
+  tenantId: string;
+
+  @ManyToOne(() => Tenant)
   tenant: Tenant;
 
   @OneToMany(() => Employee, employee => employee.department)
   employees: Employee[];
+
+  // Position relation - defined here for TypeORM
+  positions?: any[];
 
   @CreateDateColumn()
   createdAt: Date;
