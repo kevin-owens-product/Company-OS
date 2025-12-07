@@ -98,7 +98,7 @@ export default function CodebaseDetailPage() {
   const { status: authStatus } = useSession();
   const router = useRouter();
   const params = useParams();
-  const codebaseId = params.id as string;
+  const codebaseId = params?.id as string;
   const queryClient = useQueryClient();
 
   const [tabValue, setTabValue] = useState(0);
