@@ -53,7 +53,7 @@ export class Leave {
   @Column({ type: 'jsonb', default: {} })
   approvals: Record<string, any>;
 
-  @ManyToOne(() => Employee, employee => employee.leaves)
+  @ManyToOne(() => Employee, (employee: Employee) => employee.leaves)
   employee: Employee;
 
   @CreateDateColumn()

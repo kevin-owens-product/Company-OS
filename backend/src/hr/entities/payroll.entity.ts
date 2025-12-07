@@ -50,7 +50,7 @@ export class Payroll {
   @Column({ type: 'jsonb', default: {} })
   benefits: Record<string, any>;
 
-  @ManyToOne(() => Employee, employee => employee.payrolls)
+  @ManyToOne(() => Employee, (employee: Employee) => employee.payrolls)
   employee: Employee;
 
   @CreateDateColumn()

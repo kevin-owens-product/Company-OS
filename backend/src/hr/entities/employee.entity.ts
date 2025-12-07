@@ -40,19 +40,19 @@ export class Employee {
   @Column({ default: true })
   isActive: boolean;
 
-  @ManyToOne(() => User, user => user.employee)
+  @ManyToOne(() => User)
   user: User;
 
-  @ManyToOne(() => Department, department => department.employees)
+  @ManyToOne(() => Department, (department: Department) => department.employees)
   department: Department;
 
-  @ManyToOne(() => Position, position => position.employees)
+  @ManyToOne(() => Position, (position: Position) => position.employees)
   position: Position;
 
-  @OneToMany(() => Leave, leave => leave.employee)
+  @OneToMany(() => Leave, (leave: Leave) => leave.employee)
   leaves: Leave[];
 
-  @OneToMany(() => Payroll, payroll => payroll.employee)
+  @OneToMany(() => Payroll, (payroll: Payroll) => payroll.employee)
   payrolls: Payroll[];
 
   @CreateDateColumn()

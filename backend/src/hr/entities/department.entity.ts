@@ -28,7 +28,7 @@ export class Department {
   @ManyToOne(() => Tenant)
   tenant: Tenant;
 
-  @OneToMany(() => Employee, employee => employee.department)
+  @OneToMany(() => Employee, (employee: Employee) => employee.department)
   employees: Employee[];
 
   // Position relation - defined here for TypeORM
