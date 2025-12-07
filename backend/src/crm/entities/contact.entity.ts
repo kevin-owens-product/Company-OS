@@ -55,11 +55,14 @@ export class Contact {
   @Column({ type: 'date', nullable: true })
   lastContactDate: Date;
 
-  @ManyToOne(() => Customer, customer => customer.contacts)
+  @ManyToOne(() => Customer)
   customer: Customer;
 
-  @ManyToOne(() => Tenant, tenant => tenant.contacts)
+  @ManyToOne(() => Tenant)
   tenant: Tenant;
+
+  // Relations for CRM module
+  activities?: any[];
 
   @CreateDateColumn()
   createdAt: Date;

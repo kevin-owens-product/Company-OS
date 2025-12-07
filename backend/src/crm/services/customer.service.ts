@@ -54,7 +54,7 @@ export class CustomerService {
     await this.customerRepository.remove(customer);
   }
 
-  async findByEmail(email: string, tenantId: string): Promise<Customer | undefined> {
+  async findByEmail(email: string, tenantId: string): Promise<Customer | null> {
     return await this.customerRepository.findOne({
       where: { email, tenant: { id: tenantId } },
     });

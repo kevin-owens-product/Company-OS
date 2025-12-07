@@ -57,11 +57,14 @@ export class Opportunity {
   @Column({ type: 'text', nullable: true })
   notes: string;
 
-  @ManyToOne(() => Customer, customer => customer.opportunities)
+  @ManyToOne(() => Customer)
   customer: Customer;
 
-  @ManyToOne(() => Tenant, tenant => tenant.opportunities)
+  @ManyToOne(() => Tenant)
   tenant: Tenant;
+
+  // Relations for CRM module
+  activities?: any[];
 
   @CreateDateColumn()
   createdAt: Date;
