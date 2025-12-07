@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Codebase, CodebaseStatus } from '../entities/codebase.entity';
 import { CreateCodebaseDto } from '../dto/create-codebase.dto';
-import { UpdateCodebaseDto } from '../dto/update-codebase.dto';
+import { UpdateCodebaseDto } from '../dto/create-codebase.dto';
 
 @Injectable()
 export class CodebaseService {
