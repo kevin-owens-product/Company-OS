@@ -24,7 +24,7 @@ export class Tenant {
   @Column({ type: 'timestamp', nullable: true })
   subscriptionEndDate: Date;
 
-  @OneToMany(() => User, user => user.tenant)
+  @OneToMany(() => User, (user: User) => user.tenant)
   users: User[];
 
   // These relations are defined in HR module but referenced here for TypeORM

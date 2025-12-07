@@ -38,7 +38,7 @@ export class Position {
   @ManyToOne(() => Department)
   department: Department;
 
-  @OneToMany(() => Employee, employee => employee.position)
+  @OneToMany(() => Employee, (employee: Employee) => employee.position)
   employees: Employee[];
 
   @CreateDateColumn()

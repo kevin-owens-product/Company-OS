@@ -25,10 +25,10 @@ export class User {
   @Column({ nullable: true })
   lastLoginAt: Date;
 
-  @ManyToOne(() => Tenant, tenant => tenant.users)
+  @ManyToOne(() => Tenant, (tenant: Tenant) => tenant.users)
   tenant: Tenant;
 
-  @ManyToOne(() => Role, role => role.users)
+  @ManyToOne(() => Role, (role: Role) => role.users)
   role: Role;
 
   @CreateDateColumn()

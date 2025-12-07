@@ -15,7 +15,7 @@ export class Role {
   @Column({ nullable: true })
   description: string;
 
-  @OneToMany(() => User, user => user.role)
+  @OneToMany(() => User, (user: User) => user.role)
   users: User[];
 
   @CreateDateColumn()
