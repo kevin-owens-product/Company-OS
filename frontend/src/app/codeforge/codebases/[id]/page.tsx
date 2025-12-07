@@ -75,6 +75,7 @@ const repoStatusColors: Record<RepositoryStatus, 'default' | 'warning' | 'info' 
   [RepositoryStatus.PENDING]: 'default',
   [RepositoryStatus.CLONING]: 'warning',
   [RepositoryStatus.READY]: 'success',
+  [RepositoryStatus.STALE]: 'warning',
   [RepositoryStatus.ERROR]: 'error',
   [RepositoryStatus.ARCHIVED]: 'default',
 };

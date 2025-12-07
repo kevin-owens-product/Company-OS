@@ -2,8 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Playbook, PlaybookCategory, PlaybookStatus } from '../entities/playbook.entity';
-import { CreatePlaybookDto } from '../dto/create-playbook.dto';
-import { UpdatePlaybookDto } from '../dto/create-playbook.dto';
+import { CreatePlaybookDto, UpdatePlaybookDto } from '../dto/create-playbook.dto';
 
 @Injectable()
 export class PlaybookService {
