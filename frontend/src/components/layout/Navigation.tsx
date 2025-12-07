@@ -24,6 +24,7 @@ import {
   Inventory,
   Assignment,
   Settings,
+  Code,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSession } from 'next-auth/react';
@@ -44,6 +45,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
 
   const menuItems = [
     { text: t('navigation.dashboard'), icon: <Dashboard />, path: '/dashboard' },
+    { text: t('navigation.codeforge'), icon: <Code />, path: '/codeforge' },
     { text: t('navigation.hr'), icon: <People />, path: '/hr' },
     { text: t('navigation.crm'), icon: <Business />, path: '/crm' },
     { text: t('navigation.finance'), icon: <AttachMoney />, path: '/finance' },
