@@ -105,9 +105,10 @@ export default function CodebaseDetailPage() {
   const [addRepoOpen, setAddRepoOpen] = useState(false);
   const [newRepo, setNewRepo] = useState<CreateRepositoryDto>({
     name: '',
-    url: '',
+    remoteUrl: '',
     provider: RepositoryProvider.GITHUB,
     branch: 'main',
+    codebaseId: codebaseId,
   });
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
@@ -148,7 +149,7 @@ export default function CodebaseDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['repositories', codebaseId] });
       setAddRepoOpen(false);
-      setNewRepo({ name: '', url: '', provider: RepositoryProvider.GITHUB, branch: 'main' });
+      setNewRepo({ name: '', remoteUrl: '', provider: RepositoryProvider.GITHUB, branch: 'main', codebaseId });
       setSnackbar({ open: true, message: 'Repository added successfully', severity: 'success' });
     },
     onError: (error: any) => {
@@ -182,7 +183,7 @@ export default function CodebaseDetailPage() {
   });
 
   const handleAddRepo = () => {
-    if (!newRepo.name.trim() || !newRepo.url.trim()) return;
+    if (!newRepo.name.trim() || !newRepo.remoteUrl.trim()) return;
     addRepoMutation.mutate(newRepo);
   };
 
@@ -208,7 +209,7 @@ export default function CodebaseDetailPage() {
   const handleUrlChange = (url: string) => {
     const provider = detectProvider(url);
     const name = extractRepoName(url);
-    setNewRepo((prev) => ({ ...prev, url, provider, name: name || prev.name }));
+    setNewRepo((prev) => ({ ...prev, remoteUrl: url, provider, name: name || prev.name }));
   };
 
   const getProviderIcon = (provider: RepositoryProvider) => {
@@ -414,7 +415,7 @@ export default function CodebaseDetailPage() {
                         <Box>
                           <Typography variant="subtitle2">{repo.name}</Typography>
                           <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
-                            {repo.url}
+                            {repo.remoteUrl}
                           </Typography>
                         </Box>
                       </Box>
@@ -542,7 +543,7 @@ export default function CodebaseDetailPage() {
             placeholder="https://github.com/org/repo.git"
             fullWidth
             required
-            value={newRepo.url}
+            value={newRepo.remoteUrl}
             onChange={(e) => handleUrlChange(e.target.value)}
             sx={{ mb: 2 }}
           />
@@ -585,7 +586,7 @@ export default function CodebaseDetailPage() {
           <Button
             variant="contained"
             onClick={handleAddRepo}
-            disabled={!newRepo.name.trim() || !newRepo.url.trim() || addRepoMutation.isPending}
+            disabled={!newRepo.name.trim() || !newRepo.remoteUrl.trim() || addRepoMutation.isPending}
           >
             {addRepoMutation.isPending ? <CircularProgress size={24} /> : 'Add Repository'}
           </Button>
