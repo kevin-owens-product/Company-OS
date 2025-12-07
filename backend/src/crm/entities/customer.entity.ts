@@ -64,8 +64,13 @@ export class Customer {
   @Column({ type: 'text', nullable: true })
   notes: string;
 
-  @ManyToOne(() => Tenant, tenant => tenant.customers)
+  @ManyToOne(() => Tenant)
   tenant: Tenant;
+
+  // Relations for CRM module
+  opportunities?: any[];
+  contacts?: any[];
+  activities?: any[];
 
   @CreateDateColumn()
   createdAt: Date;

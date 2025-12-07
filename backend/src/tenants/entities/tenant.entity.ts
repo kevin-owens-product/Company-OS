@@ -31,6 +31,12 @@ export class Tenant {
   departments?: any[];
   positions?: any[];
 
+  // CRM relations
+  customers?: any[];
+  opportunities?: any[];
+  contacts?: any[];
+  activities?: any[];
+
   @CreateDateColumn()
   createdAt: Date;
 

@@ -72,16 +72,16 @@ export class Activity {
   @Column({ type: 'text', nullable: true })
   notes: string;
 
-  @ManyToOne(() => Customer, customer => customer.activities)
+  @ManyToOne(() => Customer)
   customer: Customer;
 
-  @ManyToOne(() => Contact, contact => contact.activities, { nullable: true })
+  @ManyToOne(() => Contact, { nullable: true })
   contact: Contact;
 
-  @ManyToOne(() => Opportunity, opportunity => opportunity.activities, { nullable: true })
+  @ManyToOne(() => Opportunity, { nullable: true })
   opportunity: Opportunity;
 
-  @ManyToOne(() => Tenant, tenant => tenant.activities)
+  @ManyToOne(() => Tenant)
   tenant: Tenant;
 
   @CreateDateColumn()
