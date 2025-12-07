@@ -1,14 +1,13 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { TenantGuard } from '../../tenants/guards/tenant.guard';
 import { OpportunityService } from '../services/opportunity.service';
 import { Opportunity, OpportunityStage } from '../entities/opportunity.entity';
 import { CreateOpportunityDto } from '../dto/create-opportunity.dto';
 
 @ApiTags('opportunities')
 @Controller('opportunities')
-@UseGuards(JwtAuthGuard, TenantGuard)
+@UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class OpportunityController {
   constructor(private readonly opportunityService: OpportunityService) {}
