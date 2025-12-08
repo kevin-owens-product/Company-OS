@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "npx next dev",
     "build": "npx next build",
-    "start": "npx next start",
+    "start": "npx next start -H 0.0.0.0 -p ${PORT:-3000}",
     "lint": "npx next lint",
     "test": "jest",
     "test:watch": "jest --watch",
