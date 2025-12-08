@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -21,16 +21,13 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  TextField,
   Chip,
   Paper,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  ListItemSecondaryAction,
   Checkbox,
-  Divider,
   RadioGroup,
   Radio,
   FormControlLabel,
@@ -76,7 +73,7 @@ const oversightLevelDescriptions: Record<OversightLevel, string> = {
   [OversightLevel.MANUAL]: 'Generate plan only, manual execution',
 };
 
-export default function NewTransformationPage() {
+function NewTransformationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { status: authStatus } = useSession();
@@ -566,5 +563,13 @@ export default function NewTransformationPage() {
         </Button>
       </Box>
     </Container>
+  );
+}
+
+export default function NewTransformationPage() {
+  return (
+    <Suspense fallback={<Box sx={{ display: 'flex', justifyContent: 'center', p: 8 }}><CircularProgress /></Box>}>
+      <NewTransformationContent />
+    </Suspense>
   );
 }

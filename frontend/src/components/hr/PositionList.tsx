@@ -40,7 +40,7 @@ export const PositionList: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm(t('hr.position.confirmDelete'))) {
       try {
-        await positionService.remove(id);
+        await positionService.delete(id);
         await loadPositions();
       } catch (error) {
         console.error('Error deleting position:', error);

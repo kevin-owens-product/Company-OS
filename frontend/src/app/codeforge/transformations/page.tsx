@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -52,7 +53,7 @@ const statusConfig: Record<TransformationStatus, { color: 'default' | 'warning' 
   [TransformationStatus.CANCELLED]: { color: 'default', label: 'Cancelled' },
 };
 
-export default function TransformationsPage() {
+function TransformationsContent() {
   const { status: authStatus } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -357,5 +358,13 @@ export default function TransformationsPage() {
         </Alert>
       </Snackbar>
     </Container>
+  );
+}
+
+export default function TransformationsPage() {
+  return (
+    <Suspense fallback={<LinearProgress />}>
+      <TransformationsContent />
+    </Suspense>
   );
 }

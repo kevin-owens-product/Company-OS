@@ -16,7 +16,10 @@ const getApiUrl = () => {
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 // Add CORS configuration
-export const API_CONFIG = {
+export const API_CONFIG: {
+  headers: Record<string, string>;
+  credentials: RequestCredentials;
+} = {
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
