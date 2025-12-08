@@ -8,6 +8,9 @@ import { StripeModule } from './stripe/stripe.module';
 import { KafkaModule } from './kafka/kafka.module';
 import { RedisModule } from './redis/redis.module';
 import { CodeForgeModule } from './codeforge/codeforge.module';
+import { HrModule } from './hr/hr.module';
+import { CrmModule } from './crm/crm.module';
+import { SeedModule } from './seed/seed.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -29,6 +32,9 @@ import { AppService } from './app.service';
     KafkaModule,
     RedisModule,
     CodeForgeModule,
+    HrModule,
+    CrmModule,
+    SeedModule,
   ],
   controllers: [AppController],
   providers: [AppService],
