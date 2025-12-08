@@ -40,7 +40,6 @@ export const PositionForm: React.FC<PositionFormProps> = ({
     requirements: {},
     responsibilities: {},
     isActive: true,
-    tenantId: '',
     departmentId: '',
   });
   const [departments, setDepartments] = useState<any[]>([]);
@@ -54,7 +53,6 @@ export const PositionForm: React.FC<PositionFormProps> = ({
         requirements: position.requirements || {},
         responsibilities: position.responsibilities || {},
         isActive: position.isActive ?? true,
-        tenantId: position.tenantId || '',
         departmentId: position.departmentId || '',
       });
     }

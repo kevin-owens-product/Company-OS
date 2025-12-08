@@ -14,7 +14,7 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { leaveService, CreateLeaveDto } from '../../services/hr/leave.service';
+import { leaveService, CreateLeaveDto, LeaveType } from '../../services/hr/leave.service';
 import { employeeService } from '../../services/hr/employee.service';
 import { useTranslation } from 'react-i18next';
 
@@ -33,28 +33,26 @@ export const LeaveForm: React.FC<LeaveFormProps> = ({
 }) => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState<CreateLeaveDto>({
-    type: '',
+    type: LeaveType.ANNUAL,
     startDate: new Date(),
     endDate: new Date(),
     duration: 0,
     reason: '',
-    attachments: [],
+    attachments: {},
     employeeId: '',
-    tenantId: '',
   });
   const [employees, setEmployees] = useState<any[]>([]);
 
   useEffect(() => {
     if (leave) {
       setFormData({
-        type: leave.type || '',
+        type: leave.type || LeaveType.ANNUAL,
         startDate: new Date(leave.startDate),
         endDate: new Date(leave.endDate),
         duration: leave.duration || 0,
         reason: leave.reason || '',
-        attachments: leave.attachments || [],
+        attachments: leave.attachments || {},
         employeeId: leave.employeeId || '',
-        tenantId: leave.tenantId || '',
       });
     }
     loadEmployees();
@@ -150,7 +148,7 @@ export const LeaveForm: React.FC<LeaveFormProps> = ({
               label={t('hr.leave.startDate')}
               value={formData.startDate}
               onChange={handleDateChange('startDate')}
-              renderInput={(params) => <TextField {...params} fullWidth required />}
+              slotProps={{ textField: { fullWidth: true, required: true } }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -158,7 +156,7 @@ export const LeaveForm: React.FC<LeaveFormProps> = ({
               label={t('hr.leave.endDate')}
               value={formData.endDate}
               onChange={handleDateChange('endDate')}
-              renderInput={(params) => <TextField {...params} fullWidth required />}
+              slotProps={{ textField: { fullWidth: true, required: true } }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
