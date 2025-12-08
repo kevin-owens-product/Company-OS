@@ -5,8 +5,8 @@ import { ContactService } from '../services/contact.service';
 import { Contact } from '../entities/contact.entity';
 import { CreateContactDto } from '../dto/create-contact.dto';
 
-@ApiTags('contacts')
-@Controller('contacts')
+@ApiTags('crm/contacts')
+@Controller('crm/contacts')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class ContactController {

@@ -5,8 +5,8 @@ import { UpdatePositionDto } from '../dto/update-position.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Position } from '../entities/position.entity';
 
-@ApiTags('positions')
-@Controller('positions')
+@ApiTags('hr/positions')
+@Controller('hr/positions')
 export class PositionController {
   constructor(private readonly positionService: PositionService) {}
 

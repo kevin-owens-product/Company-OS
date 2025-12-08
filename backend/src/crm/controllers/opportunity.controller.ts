@@ -5,8 +5,8 @@ import { OpportunityService } from '../services/opportunity.service';
 import { Opportunity, OpportunityStage } from '../entities/opportunity.entity';
 import { CreateOpportunityDto } from '../dto/create-opportunity.dto';
 
-@ApiTags('opportunities')
-@Controller('opportunities')
+@ApiTags('crm/opportunities')
+@Controller('crm/opportunities')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class OpportunityController {

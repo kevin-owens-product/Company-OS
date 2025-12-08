@@ -5,8 +5,8 @@ import { UpdatePayrollDto } from '../dto/update-payroll.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Payroll, PayrollStatus } from '../entities/payroll.entity';
 
-@ApiTags('payrolls')
-@Controller('payrolls')
+@ApiTags('hr/payrolls')
+@Controller('hr/payrolls')
 export class PayrollController {
   constructor(private readonly payrollService: PayrollService) {}
 

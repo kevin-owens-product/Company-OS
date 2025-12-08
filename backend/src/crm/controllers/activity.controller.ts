@@ -5,8 +5,8 @@ import { ActivityService } from '../services/activity.service';
 import { Activity, ActivityType, ActivityStatus } from '../entities/activity.entity';
 import { CreateActivityDto } from '../dto/create-activity.dto';
 
-@ApiTags('activities')
-@Controller('activities')
+@ApiTags('crm/activities')
+@Controller('crm/activities')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class ActivityController {
