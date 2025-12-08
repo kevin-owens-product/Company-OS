@@ -27,7 +27,7 @@ const CodeForgeLayout: React.FC<CodeForgeLayoutProps> = ({ children }) => {
   const pageTitle = getPageTitle(pathname);
 
   return (
-    <div className="min-h-screen bg-slate-900 flex text-slate-100">
+    <div className="codeforge-app min-h-screen bg-slate-900 flex text-slate-100">
       <Sidebar />
 
       <main className="flex-1 ml-64 p-8">
