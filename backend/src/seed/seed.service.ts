@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class SeedService {
@@ -19,6 +20,45 @@ export class SeedService {
       // Get the actual tenant ID (in case it already existed)
       const tenantResult = await this.dataSource.query(`SELECT id FROM tenants WHERE domain = 'demo-company.com'`);
       const actualTenantId = tenantResult[0]?.id || tenantId;
+
+      // Create roles
+      const adminRoleId = uuidv4();
+      const userRoleId = uuidv4();
+
+      await this.dataSource.query(`
+        INSERT INTO roles (id, name, permissions, description, "createdAt", "updatedAt")
+        VALUES ($1, $2, $3, $4, NOW(), NOW())
+        ON CONFLICT (name) DO UPDATE SET "updatedAt" = NOW() RETURNING id
+      `, [adminRoleId, 'admin', JSON.stringify(['*']), 'Full system administrator']);
+
+      await this.dataSource.query(`
+        INSERT INTO roles (id, name, permissions, description, "createdAt", "updatedAt")
+        VALUES ($1, $2, $3, $4, NOW(), NOW())
+        ON CONFLICT (name) DO UPDATE SET "updatedAt" = NOW() RETURNING id
+      `, [userRoleId, 'user', JSON.stringify(['read', 'write']), 'Standard user']);
+
+      // Get actual role IDs
+      const adminRoleResult = await this.dataSource.query(`SELECT id FROM roles WHERE name = 'admin'`);
+      const userRoleResult = await this.dataSource.query(`SELECT id FROM roles WHERE name = 'user'`);
+      const actualAdminRoleId = adminRoleResult[0]?.id || adminRoleId;
+      const actualUserRoleId = userRoleResult[0]?.id || userRoleId;
+
+      // Create demo users with bcrypt-hashed passwords
+      // Demo credentials: admin@demo.com / demo123, user@demo.com / demo123
+      const hashedPassword = await bcrypt.hash('demo123', 10);
+
+      const demoUsers = [
+        { firstName: 'Admin', lastName: 'User', email: 'admin@demo.com', roleId: actualAdminRoleId },
+        { firstName: 'Demo', lastName: 'User', email: 'user@demo.com', roleId: actualUserRoleId },
+      ];
+
+      for (const user of demoUsers) {
+        await this.dataSource.query(`
+          INSERT INTO users (id, "firstName", "lastName", email, password, "isActive", "tenantId", "roleId", "createdAt", "updatedAt")
+          VALUES ($1, $2, $3, $4, $5, true, $6, $7, NOW(), NOW())
+          ON CONFLICT (email) DO UPDATE SET password = $5, "updatedAt" = NOW()
+        `, [uuidv4(), user.firstName, user.lastName, user.email, hashedPassword, actualTenantId, user.roleId]);
+      }
 
       // Create departments
       const departments = [
