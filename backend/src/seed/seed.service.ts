@@ -8,16 +8,16 @@ export class SeedService {
 
   async seed(): Promise<{ success: boolean; message: string }> {
     try {
-      // Create a default tenant
+      // Create a default tenant (using 'domain' column, not 'slug')
       const tenantId = uuidv4();
       await this.dataSource.query(`
-        INSERT INTO tenants (id, name, slug, settings, "isActive", "createdAt", "updatedAt")
+        INSERT INTO tenants (id, name, domain, settings, "isActive", "createdAt", "updatedAt")
         VALUES ($1, $2, $3, $4, true, NOW(), NOW())
-        ON CONFLICT (slug) DO UPDATE SET "updatedAt" = NOW() RETURNING id
-      `, [tenantId, 'Demo Company', 'demo-company', JSON.stringify({ theme: 'light', language: 'en' })]);
+        ON CONFLICT (domain) DO UPDATE SET "updatedAt" = NOW() RETURNING id
+      `, [tenantId, 'Demo Company', 'demo-company.com', JSON.stringify({ theme: 'light', language: 'en' })]);
 
       // Get the actual tenant ID (in case it already existed)
-      const tenantResult = await this.dataSource.query(`SELECT id FROM tenants WHERE slug = 'demo-company'`);
+      const tenantResult = await this.dataSource.query(`SELECT id FROM tenants WHERE domain = 'demo-company.com'`);
       const actualTenantId = tenantResult[0]?.id || tenantId;
 
       // Create departments
@@ -105,9 +105,9 @@ export class SeedService {
       const empResult = await this.dataSource.query(`SELECT id FROM employees LIMIT 12`);
       const actualEmployeeIds = empResult.map((e: any) => e.id);
 
-      // Create leaves
-      const leaveTypes = ['ANNUAL', 'SICK', 'PERSONAL', 'MATERNITY', 'PATERNITY'];
-      const leaveStatuses = ['PENDING', 'APPROVED', 'REJECTED'];
+      // Create leaves (using lowercase enum values per entity definition)
+      const leaveTypes = ['annual', 'sick', 'maternity', 'paternity', 'bereavement', 'unpaid'];
+      const leaveStatuses = ['pending', 'approved', 'rejected', 'cancelled'];
 
       for (let i = 0; i < 8; i++) {
         const empIdx = Math.floor(Math.random() * Math.min(actualEmployeeIds.length, 8));
@@ -117,8 +117,8 @@ export class SeedService {
 
         if (actualEmployeeIds[empIdx]) {
           await this.dataSource.query(`
-            INSERT INTO leaves (id, type, "startDate", "endDate", duration, reason, status, attachments, "employeeId", "createdAt", "updatedAt")
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
+            INSERT INTO leaves (id, type, "startDate", "endDate", duration, reason, status, attachments, approvals, "employeeId", "createdAt", "updatedAt")
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())
             ON CONFLICT (id) DO NOTHING
           `, [
             uuidv4(),
@@ -129,13 +129,14 @@ export class SeedService {
             'Personal time off request',
             leaveStatuses[Math.floor(Math.random() * leaveStatuses.length)],
             JSON.stringify({}),
+            JSON.stringify({}),
             actualEmployeeIds[empIdx]
           ]);
         }
       }
 
-      // Create payrolls
-      const payrollStatuses = ['PENDING', 'PROCESSING', 'COMPLETED'];
+      // Create payrolls (using lowercase enum values)
+      const payrollStatuses = ['pending', 'processing', 'completed'];
 
       for (let month = 0; month < 3; month++) {
         for (let i = 0; i < Math.min(actualEmployeeIds.length, 8); i++) {
@@ -168,7 +169,7 @@ export class SeedService {
         }
       }
 
-      // Create CRM customers
+      // Create CRM customers (using lowercase enum values)
       const customers = [
         { name: 'Acme Corporation', type: 'company', status: 'customer', email: 'contact@acme.com' },
         { name: 'TechStart Inc', type: 'company', status: 'customer', email: 'info@techstart.io' },
@@ -184,8 +185,8 @@ export class SeedService {
         customerIds.push(custId);
 
         await this.dataSource.query(`
-          INSERT INTO customers (id, name, type, status, email, phone, address, "companyDetails", "contactDetails", "lifetimeValue", tags, notes, "createdAt", "updatedAt")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW(), NOW())
+          INSERT INTO customers (id, name, type, status, email, phone, address, "companyDetails", "contactDetails", "lifetimeValue", tags, notes, "tenantId", "createdAt", "updatedAt")
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW())
           ON CONFLICT (id) DO NOTHING
         `, [
           custId,
@@ -199,7 +200,8 @@ export class SeedService {
           JSON.stringify({ website: `https://${cust.name.toLowerCase().replace(/\s+/g, '')}.com` }),
           Math.floor(Math.random() * 100000),
           JSON.stringify(['enterprise', 'tech']),
-          'Key account'
+          'Key account',
+          actualTenantId
         ]);
       }
 
@@ -218,8 +220,8 @@ export class SeedService {
         const custIdx = i % customerIds.length;
 
         await this.dataSource.query(`
-          INSERT INTO contacts (id, "firstName", "lastName", title, department, email, phone, mobile, "socialProfiles", "isPrimary", preferences, notes, tags, "lastContactDate", "customerId", "createdAt", "updatedAt")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, NOW(), NOW())
+          INSERT INTO contacts (id, "firstName", "lastName", title, department, email, phone, mobile, "socialProfiles", "isPrimary", preferences, notes, tags, "lastContactDate", "customerId", "tenantId", "createdAt", "updatedAt")
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW(), NOW())
           ON CONFLICT (id) DO NOTHING
         `, [
           uuidv4(),
@@ -236,63 +238,74 @@ export class SeedService {
           'Key decision maker',
           JSON.stringify(['decision-maker', 'executive']),
           new Date(2024, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
-          customerIds[custIdx]
+          customerIds[custIdx],
+          actualTenantId
         ]);
       }
 
-      // Create opportunities
-      const opportunityStages = ['LEAD', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON', 'CLOSED_LOST'];
+      // Create opportunities (using correct schema with lowercase enum values)
+      const opportunityStages = ['qualification', 'needs_analysis', 'proposal', 'negotiation', 'closed_won', 'closed_lost'];
+      const opportunityPriorities = ['low', 'medium', 'high'];
 
       for (let i = 0; i < 8; i++) {
         const custIdx = Math.floor(Math.random() * customerIds.length);
         const stage = opportunityStages[Math.floor(Math.random() * opportunityStages.length)];
+        const probability = stage === 'closed_won' ? 1.00 : stage === 'closed_lost' ? 0.00 : (Math.floor(Math.random() * 80) + 10) / 100;
 
         await this.dataSource.query(`
-          INSERT INTO opportunities (id, title, description, value, currency, stage, probability, "expectedCloseDate", "actualCloseDate", notes, tags, "customerId", "createdAt", "updatedAt")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW(), NOW())
+          INSERT INTO opportunities (id, title, description, value, probability, stage, priority, "expectedCloseDate", products, "customFields", notes, "customerId", "tenantId", "createdAt", "updatedAt")
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW())
           ON CONFLICT (id) DO NOTHING
         `, [
           uuidv4(),
           `Enterprise Deal ${i + 1}`,
           'Enterprise software implementation project',
           10000 + Math.floor(Math.random() * 90000),
-          'USD',
+          probability,
           stage,
-          stage === 'CLOSED_WON' ? 100 : stage === 'CLOSED_LOST' ? 0 : Math.floor(Math.random() * 80) + 10,
+          opportunityPriorities[Math.floor(Math.random() * opportunityPriorities.length)],
           new Date(2024, 11 + Math.floor(Math.random() * 3), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
-          stage.startsWith('CLOSED') ? new Date().toISOString().split('T')[0] : null,
+          JSON.stringify([]),
+          JSON.stringify({}),
           'High priority deal',
-          JSON.stringify(['enterprise', 'q4']),
-          customerIds[custIdx]
+          customerIds[custIdx],
+          actualTenantId
         ]);
       }
 
-      // Create CRM activities
-      const activityTypes = ['CALL', 'EMAIL', 'MEETING', 'NOTE', 'TASK'];
+      // Create CRM activities (using correct schema with lowercase enum values)
+      const activityTypes = ['call', 'email', 'meeting', 'task', 'note', 'follow_up'];
+      const activityStatuses = ['planned', 'in_progress', 'completed', 'cancelled'];
+      const activityPriorities = ['low', 'medium', 'high'];
 
       for (let i = 0; i < 15; i++) {
         const custIdx = Math.floor(Math.random() * customerIds.length);
         const activityType = activityTypes[Math.floor(Math.random() * activityTypes.length)];
+        const status = activityStatuses[Math.floor(Math.random() * activityStatuses.length)];
 
         await this.dataSource.query(`
-          INSERT INTO activities (id, type, subject, description, "scheduledAt", "completedAt", duration, outcome, notes, "customerId", "createdAt", "updatedAt")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())
+          INSERT INTO activities (id, type, subject, description, "scheduledAt", "completedAt", status, priority, duration, outcome, location, notes, "customerId", "tenantId", "createdAt", "updatedAt")
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW(), NOW())
           ON CONFLICT (id) DO NOTHING
         `, [
           uuidv4(),
           activityType,
-          `${activityType.charAt(0) + activityType.slice(1).toLowerCase()} with customer`,
-          `Scheduled ${activityType.toLowerCase()} regarding ongoing project`,
+          `${activityType.charAt(0).toUpperCase() + activityType.slice(1).replace('_', ' ')} with customer`,
+          `Scheduled ${activityType.replace('_', ' ')} regarding ongoing project`,
           new Date(2024, 10 + Math.floor(Math.random() * 2), Math.floor(Math.random() * 28) + 1).toISOString(),
-          Math.random() > 0.5 ? new Date().toISOString() : null,
-          30 + Math.floor(Math.random() * 60),
-          Math.random() > 0.5 ? 'Positive discussion' : null,
+          status === 'completed' ? new Date().toISOString() : null,
+          status,
+          activityPriorities[Math.floor(Math.random() * activityPriorities.length)],
+          `${30 + Math.floor(Math.random() * 60)} minutes`,
+          status === 'completed' ? JSON.stringify({ result: 'Positive discussion', nextSteps: 'Follow up next week' }) : null,
+          JSON.stringify({ type: 'virtual', link: 'https://meet.example.com/room' }),
           'Follow up required',
-          customerIds[custIdx]
+          customerIds[custIdx],
+          actualTenantId
         ]);
       }
 
-      // Create Codeforge codebases
+      // Create Codeforge codebases (using lowercase enum values)
       const codebases = [
         { name: 'Main Platform', description: 'Core platform monorepo' },
         { name: 'Mobile App', description: 'React Native mobile application' },
@@ -319,7 +332,7 @@ export class SeedService {
         ]);
       }
 
-      // Create repositories
+      // Create repositories (using correct schema)
       for (let i = 0; i < codebaseIds.length; i++) {
         const repos = [
           { name: 'frontend', remoteUrl: 'https://github.com/company/frontend' },
@@ -328,46 +341,54 @@ export class SeedService {
 
         for (const repo of repos) {
           await this.dataSource.query(`
-            INSERT INTO codeforge_repositories (id, name, "remoteUrl", provider, status, branch, "localPath", metadata, "codebaseId", "createdAt", "updatedAt")
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
+            INSERT INTO codeforge_repositories (id, name, description, "remoteUrl", provider, status, branch, metadata, "analysisConfig", "codebaseId", "createdAt", "updatedAt")
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())
             ON CONFLICT (id) DO NOTHING
           `, [
             uuidv4(),
             `${codebases[i].name.toLowerCase().replace(/\s+/g, '-')}-${repo.name}`,
+            `${repo.name} repository for ${codebases[i].name}`,
             repo.remoteUrl,
             'github',
             'ready',
             'main',
-            `/repos/${codebases[i].name.toLowerCase().replace(/\s+/g, '-')}/${repo.name}`,
             JSON.stringify({ lastCommit: 'abc123', stars: Math.floor(Math.random() * 100) }),
+            JSON.stringify({ excludePatterns: ['node_modules', '.git'] }),
             codebaseIds[i]
           ]);
         }
       }
 
-      // Create playbooks
+      // Create playbooks (using correct schema with code, status enum, rules)
       const playbooks = [
-        { name: 'Security Hardening', category: 'SECURITY', description: 'Apply security best practices' },
-        { name: 'Performance Optimization', category: 'COST_OPTIMIZATION', description: 'Optimize code performance' },
-        { name: 'Code Consolidation', category: 'CONSOLIDATION', description: 'Reduce code duplication' },
-        { name: 'Dependency Updates', category: 'DEVELOPER_EXPERIENCE', description: 'Update project dependencies' },
-        { name: 'Compliance Check', category: 'COMPLIANCE', description: 'Ensure regulatory compliance' },
+        { code: 'PB-201', name: 'Security Hardening', category: 'security', description: 'Apply security best practices' },
+        { code: 'PB-301', name: 'Performance Optimization', category: 'cost_optimization', description: 'Optimize code performance' },
+        { code: 'PB-101', name: 'Code Consolidation', category: 'consolidation', description: 'Reduce code duplication' },
+        { code: 'PB-401', name: 'Dependency Updates', category: 'developer_experience', description: 'Update project dependencies' },
+        { code: 'PB-501', name: 'Compliance Check', category: 'compliance', description: 'Ensure regulatory compliance' },
       ];
 
       for (const pb of playbooks) {
         await this.dataSource.query(`
-          INSERT INTO codeforge_playbooks (id, name, description, category, version, steps, "isBuiltIn", "isActive", "tenantId", "createdAt", "updatedAt")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
+          INSERT INTO codeforge_playbooks (id, code, name, description, category, status, version, "isBuiltIn", config, rules, "oversightConfig", metrics, "tenantId", "createdAt", "updatedAt")
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW())
           ON CONFLICT (id) DO NOTHING
         `, [
           uuidv4(),
+          pb.code,
           pb.name,
           pb.description,
           pb.category,
+          'active',
           '1.0.0',
-          JSON.stringify([{ name: 'Analyze', order: 1 }, { name: 'Transform', order: 2 }, { name: 'Validate', order: 3 }]),
           true,
-          true,
+          JSON.stringify({ targetLanguages: ['TypeScript', 'JavaScript'], estimatedEffort: '2-4 hours', riskLevel: 'low' }),
+          JSON.stringify([
+            { id: uuidv4(), name: 'Analyze', description: 'Analyze codebase', pattern: '**/*.ts', action: 'flag', autoFix: false, priority: 1 },
+            { id: uuidv4(), name: 'Transform', description: 'Apply transformations', pattern: '**/*.ts', action: 'refactor', autoFix: true, priority: 2 },
+          ]),
+          JSON.stringify({ level: 'notify', approvalRequired: false, notifyOnExecution: true }),
+          JSON.stringify({ timesExecuted: 0, successRate: 0, avgExecutionTime: 0, findingsResolved: 0 }),
           actualTenantId
         ]);
       }

@@ -5,8 +5,8 @@ import { CustomerService } from '../services/customer.service';
 import { Customer } from '../entities/customer.entity';
 import { CreateCustomerDto } from '../dto/create-customer.dto';
 
-@ApiTags('customers')
-@Controller('customers')
+@ApiTags('crm/customers')
+@Controller('crm/customers')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class CustomerController {

@@ -5,8 +5,8 @@ import { UpdateLeaveDto } from '../dto/update-leave.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Leave, LeaveType, LeaveStatus } from '../entities/leave.entity';
 
-@ApiTags('leaves')
-@Controller('leaves')
+@ApiTags('hr/leaves')
+@Controller('hr/leaves')
 export class LeaveController {
   constructor(private readonly leaveService: LeaveService) {}
 

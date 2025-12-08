@@ -5,8 +5,8 @@ import { UpdateDepartmentDto } from '../dto/update-department.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Department } from '../entities/department.entity';
 
-@ApiTags('departments')
-@Controller('departments')
+@ApiTags('hr/departments')
+@Controller('hr/departments')
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
 
