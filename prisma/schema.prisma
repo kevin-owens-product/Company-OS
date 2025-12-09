@@ -1,0 +1,358 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Auth models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(USER)
+  accounts      Account[]
+  sessions      Session[]
+
+  // Subscription
+  stripeCustomerId       String?   @unique
+  stripeSubscriptionId   String?   @unique
+  stripePriceId          String?
+  stripeCurrentPeriodEnd DateTime?
+
+  // Workspace
+  workspaces  WorkspaceMember[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// Multi-tenant workspace
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  plan        Plan     @default(FREE)
+
+  members     WorkspaceMember[]
+  codebases   Codebase[]
+  playbooks   Playbook[]
+  apiKeys     ApiKey[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model WorkspaceMember {
+  id          String   @id @default(cuid())
+  userId      String
+  workspaceId String
+  role        WorkspaceRole @default(MEMBER)
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, workspaceId])
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum Plan {
+  FREE
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+// CodeForge models
+model Codebase {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  description String?
+
+  // Git connection
+  provider    GitProvider
+  repoUrl     String
+  branch      String   @default("main")
+  accessToken String?  @db.Text
+
+  // Status
+  status      CodebaseStatus @default(PENDING)
+  lastScanAt  DateTime?
+
+  // Metrics
+  riskScore   Float?
+  techDebtScore Float?
+  securityScore Float?
+  totalFiles  Int?
+  totalLines  Int?
+  languages   Json?
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  analyses    Analysis[]
+  transformations Transformation[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum GitProvider {
+  GITHUB
+  GITLAB
+  BITBUCKET
+  AZURE_DEVOPS
+}
+
+enum CodebaseStatus {
+  PENDING
+  CONNECTING
+  ANALYZING
+  READY
+  ERROR
+}
+
+model Analysis {
+  id          String   @id @default(cuid())
+  codebaseId  String
+  type        AnalysisType
+  status      AnalysisStatus @default(PENDING)
+
+  // Results
+  results     Json?
+  findings    Finding[]
+
+  startedAt   DateTime?
+  completedAt DateTime?
+  error       String?
+
+  codebase    Codebase @relation(fields: [codebaseId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+}
+
+enum AnalysisType {
+  FULL
+  SECURITY
+  TECH_DEBT
+  COMPLIANCE
+  QUICK_SCAN
+}
+
+enum AnalysisStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+model Finding {
+  id          String   @id @default(cuid())
+  analysisId  String
+
+  severity    Severity
+  type        FindingType
+  title       String
+  description String   @db.Text
+  file        String
+  line        Int?
+  code        String?  @db.Text
+  remediation String?  @db.Text
+
+  status      FindingStatus @default(OPEN)
+
+  analysis    Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum Severity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  INFO
+}
+
+enum FindingType {
+  SECURITY
+  TECH_DEBT
+  RELIABILITY
+  COMPLIANCE
+  PERFORMANCE
+  MAINTAINABILITY
+}
+
+enum FindingStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  IGNORED
+  FALSE_POSITIVE
+}
+
+model Playbook {
+  id          String   @id @default(cuid())
+  workspaceId String?
+
+  name        String
+  description String   @db.Text
+  category    PlaybookCategory
+
+  // Playbook definition
+  rules       Json
+  config      Json?
+
+  // Built-in or custom
+  isBuiltIn   Boolean  @default(false)
+  isPublic    Boolean  @default(false)
+
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  transformations Transformation[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum PlaybookCategory {
+  SECURITY_HARDENING
+  CODE_MODERNIZATION
+  DEAD_CODE_REMOVAL
+  DEPENDENCY_UPDATE
+  ARCHITECTURE_REFACTOR
+  COMPLIANCE
+  PERFORMANCE
+  CUSTOM
+}
+
+model Transformation {
+  id          String   @id @default(cuid())
+  codebaseId  String
+  playbookId  String
+
+  status      TransformationStatus @default(PLANNING)
+  progress    Int      @default(0)
+  currentStep String?
+
+  // Configuration
+  config      Json?
+  oversightLevel OversightLevel @default(REVIEW)
+  createPR    Boolean  @default(true)
+  dryRun      Boolean  @default(false)
+
+  // Results
+  changes     Json?
+  prUrl       String?
+  error       String?
+
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  codebase    Codebase @relation(fields: [codebaseId], references: [id], onDelete: Cascade)
+  playbook    Playbook @relation(fields: [playbookId], references: [id])
+  approvals   TransformationApproval[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum TransformationStatus {
+  PLANNING
+  PENDING_APPROVAL
+  APPROVED
+  EXECUTING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum OversightLevel {
+  AUTONOMOUS
+  NOTIFY
+  REVIEW
+  COLLABORATE
+  MANUAL
+}
+
+model TransformationApproval {
+  id               String   @id @default(cuid())
+  transformationId String
+  approverId       String
+  status           ApprovalStatus
+  comment          String?
+
+  transformation   Transformation @relation(fields: [transformationId], references: [id], onDelete: Cascade)
+
+  createdAt        DateTime @default(now())
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model ApiKey {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  key         String   @unique
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+}
