@@ -1,14 +1,13 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { TenantGuard } from '../../tenants/guards/tenant.guard';
 import { CustomerService } from '../services/customer.service';
 import { Customer } from '../entities/customer.entity';
 import { CreateCustomerDto } from '../dto/create-customer.dto';
 
-@ApiTags('customers')
-@Controller('customers')
-@UseGuards(JwtAuthGuard, TenantGuard)
+@ApiTags('crm/customers')
+@Controller('crm/customers')
+@UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
@@ -57,7 +56,7 @@ export class CustomerController {
   findByEmail(
     @Param('email') email: string,
     @Query('tenantId') tenantId: string,
-  ): Promise<Customer | undefined> {
+  ): Promise<Customer | null> {
     return this.customerService.findByEmail(email, tenantId);
   }
 

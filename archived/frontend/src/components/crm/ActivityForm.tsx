@@ -43,7 +43,22 @@ export default function ActivityForm({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<CreateActivityDto>({
-    defaultValues: initialData || {
+    defaultValues: initialData ? {
+      type: initialData.type,
+      subject: initialData.subject,
+      description: initialData.description || '',
+      scheduledAt: initialData.scheduledAt,
+      completedAt: initialData.completedAt || null,
+      status: initialData.status,
+      priority: initialData.priority,
+      duration: typeof initialData.duration === 'string' ? parseInt(initialData.duration) || 30 : initialData.duration || 30,
+      outcome: typeof initialData.outcome === 'object' ? '' : (initialData.outcome || ''),
+      location: typeof initialData.location === 'object' ? (initialData.location?.address || initialData.location?.link || '') : (initialData.location || ''),
+      notes: initialData.notes || '',
+      customerId: initialData.customerId,
+      contactId: initialData.contactId || '',
+      opportunityId: initialData.opportunityId || '',
+    } : {
       type: ActivityType.MEETING,
       subject: '',
       description: '',

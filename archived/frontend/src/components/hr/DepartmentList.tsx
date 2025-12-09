@@ -40,7 +40,7 @@ export const DepartmentList: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm(t('hr.department.confirmDelete'))) {
       try {
-        await departmentService.remove(id);
+        await departmentService.delete(id);
         await loadDepartments();
       } catch (error) {
         console.error('Error deleting department:', error);

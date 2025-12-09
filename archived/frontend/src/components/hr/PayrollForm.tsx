@@ -14,7 +14,7 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { payrollService, CreatePayrollDto } from '../../services/hr/payroll.service';
+import { payrollService, CreatePayrollDto, PayrollStatus } from '../../services/hr/payroll.service';
 import { employeeService } from '../../services/hr/employee.service';
 import { useTranslation } from 'react-i18next';
 
@@ -40,7 +40,7 @@ export const PayrollForm: React.FC<PayrollFormProps> = ({
     bonuses: 0,
     deductions: 0,
     netSalary: 0,
-    status: 'PENDING',
+    status: PayrollStatus.PENDING,
     details: {},
     taxInfo: {},
     benefits: {},
@@ -58,7 +58,7 @@ export const PayrollForm: React.FC<PayrollFormProps> = ({
         bonuses: payroll.bonuses || 0,
         deductions: payroll.deductions || 0,
         netSalary: payroll.netSalary || 0,
-        status: payroll.status || 'PENDING',
+        status: payroll.status || PayrollStatus.PENDING,
         details: payroll.details || {},
         taxInfo: payroll.taxInfo || {},
         benefits: payroll.benefits || {},
@@ -86,15 +86,16 @@ export const PayrollForm: React.FC<PayrollFormProps> = ({
 
     // Calculate net salary when relevant fields change
     if (['baseSalary', 'overtime', 'bonuses', 'deductions'].includes(field)) {
-      const baseSalary = field === 'baseSalary' ? parseFloat(value) : prev.baseSalary;
-      const overtime = field === 'overtime' ? parseFloat(value) : prev.overtime;
-      const bonuses = field === 'bonuses' ? parseFloat(value) : prev.bonuses;
-      const deductions = field === 'deductions' ? parseFloat(value) : prev.deductions;
-
-      setFormData((prev) => ({
-        ...prev,
-        netSalary: baseSalary + overtime + bonuses - deductions,
-      }));
+      setFormData((prev) => {
+        const baseSalary = field === 'baseSalary' ? parseFloat(value) : prev.baseSalary;
+        const overtime = field === 'overtime' ? parseFloat(value) : prev.overtime;
+        const bonuses = field === 'bonuses' ? parseFloat(value) : prev.bonuses;
+        const deductions = field === 'deductions' ? parseFloat(value) : prev.deductions;
+        return {
+          ...prev,
+          netSalary: baseSalary + overtime + bonuses - deductions,
+        };
+      });
     }
   };
 
@@ -171,7 +172,7 @@ export const PayrollForm: React.FC<PayrollFormProps> = ({
               label={t('hr.payroll.periodStart')}
               value={formData.payPeriodStart}
               onChange={handleDateChange('payPeriodStart')}
-              renderInput={(params) => <TextField {...params} fullWidth required />}
+              slotProps={{ textField: { fullWidth: true, required: true } }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -179,7 +180,7 @@ export const PayrollForm: React.FC<PayrollFormProps> = ({
               label={t('hr.payroll.periodEnd')}
               value={formData.payPeriodEnd}
               onChange={handleDateChange('payPeriodEnd')}
-              renderInput={(params) => <TextField {...params} fullWidth required />}
+              slotProps={{ textField: { fullWidth: true, required: true } }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>

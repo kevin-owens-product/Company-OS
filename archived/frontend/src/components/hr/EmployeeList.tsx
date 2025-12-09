@@ -40,7 +40,7 @@ export const EmployeeList: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm(t('hr.employee.confirmDelete'))) {
       try {
-        await employeeService.remove(id);
+        await employeeService.delete(id);
         await loadEmployees();
       } catch (error) {
         console.error('Error deleting employee:', error);

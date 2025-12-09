@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -84,11 +86,12 @@ export default function OnboardingPage() {
   const addRepositoriesMutation = useMutation({
     mutationFn: async (repos: RepoToAdd[]) => {
       for (const repo of repos) {
-        await RepositoryService.create(createdCodebaseId!, {
+        await RepositoryService.create({
           name: repo.name,
-          url: repo.url,
+          remoteUrl: repo.url,
           provider: repo.provider,
           branch: repo.branch,
+          codebaseId: createdCodebaseId!,
         });
       }
     },

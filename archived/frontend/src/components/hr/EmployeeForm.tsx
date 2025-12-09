@@ -34,17 +34,16 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
   onSave,
 }) => {
   const { t } = useTranslation();
-  const [formData, setFormData] = useState<CreateEmployeeDto | UpdateEmployeeDto>({
+  const [formData, setFormData] = useState<CreateEmployeeDto>({
     firstName: '',
     lastName: '',
     employeeId: '',
     dateOfBirth: new Date(),
-    hireDate: new Date(),
-    phoneNumber: '',
+    dateOfHire: new Date(),
+    phone: '',
     address: '',
     emergencyContact: '',
     isActive: true,
-    userId: '',
     departmentId: '',
     positionId: '',
   });
@@ -78,6 +77,13 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
   };
 
   const handleChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: event.target.value,
+    }));
+  };
+
+  const handleSelectChange = (field: string) => (event: { target: { value: string } }) => {
     setFormData((prev) => ({
       ...prev,
       [field]: event.target.value,
@@ -146,23 +152,23 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
               label={t('hr.employee.dateOfBirth')}
               value={formData.dateOfBirth}
               onChange={handleDateChange('dateOfBirth')}
-              renderInput={(params) => <TextField {...params} fullWidth required />}
+              slotProps={{ textField: { fullWidth: true, required: true } }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <DatePicker
               label={t('hr.employee.hireDate')}
-              value={formData.hireDate}
-              onChange={handleDateChange('hireDate')}
-              renderInput={(params) => <TextField {...params} fullWidth required />}
+              value={formData.dateOfHire}
+              onChange={handleDateChange('dateOfHire')}
+              slotProps={{ textField: { fullWidth: true, required: true } }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
               label={t('hr.employee.phoneNumber')}
-              value={formData.phoneNumber}
-              onChange={handleChange('phoneNumber')}
+              value={formData.phone}
+              onChange={handleChange('phone')}
             />
           </Grid>
           <Grid item xs={12}>
@@ -188,7 +194,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
               <InputLabel>{t('hr.employee.department')}</InputLabel>
               <Select
                 value={formData.departmentId}
-                onChange={handleChange('departmentId')}
+                onChange={handleSelectChange('departmentId')}
                 label={t('hr.employee.department')}
               >
                 {departments.map((dept) => (
@@ -204,7 +210,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({
               <InputLabel>{t('hr.employee.position')}</InputLabel>
               <Select
                 value={formData.positionId}
-                onChange={handleChange('positionId')}
+                onChange={handleSelectChange('positionId')}
                 label={t('hr.employee.position')}
               >
                 {positions.map((pos) => (
