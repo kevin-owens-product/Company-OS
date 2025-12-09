@@ -108,7 +108,17 @@ export async function GET() {
       },
     })
 
-    let customPlaybooks: typeof builtInPlaybooks = []
+    interface PlaybookItem {
+      id: string
+      name: string
+      description: string
+      category: string
+      rules: Record<string, unknown>
+      isBuiltIn: boolean
+      isPublic: boolean
+    }
+
+    let customPlaybooks: PlaybookItem[] = []
 
     if (user && user.workspaces.length > 0) {
       const workspaceId = user.workspaces[0].workspaceId
@@ -136,7 +146,7 @@ export async function GET() {
     }
 
     // Combine built-in and custom playbooks
-    const playbooks = [...builtInPlaybooks, ...customPlaybooks]
+    const playbooks: PlaybookItem[] = [...builtInPlaybooks, ...customPlaybooks]
 
     return NextResponse.json({ playbooks })
   } catch (error) {
